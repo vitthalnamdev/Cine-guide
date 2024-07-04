@@ -57,6 +57,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation("androidx.compose.material3:material3:1.1.0-alpha01")
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
@@ -69,6 +70,25 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
     // Kotlin Coroutines Android for running coroutines on Android
+
+    implementation("androidx.compose.material3:material3:1.1.0-alpha01")
+    implementation("androidx.compose.ui:ui:1.1.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.1.0")
+    implementation("androidx.compose.foundation:foundation:1.1.0")
+    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.4.0")
+
+
+    // outlined textview
+    implementation ("androidx.compose.material3:material3:1.1.0") // Replace with the latest version
+        implementation ("androidx.compose.ui:ui:1.1.0") // Replace with the latest version
+        implementation ("androidx.compose.ui:ui-tooling-preview:1.1.0") // Replace with the latest version
+        implementation ("androidx.compose.foundation:foundation:1.1.0") // Replace with the latest version
+        implementation ("androidx.activity:activity-compose:1.4.0") // Replace with the latest version
+        implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.4.0") // Replace with the latest version
+
+
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0")
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)

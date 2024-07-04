@@ -3,6 +3,7 @@ package com.example.cine_guide.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cine_guide.Repository.ProductRepository
+import com.example.cine_guide.Repository.searchrepository
 import com.example.cine_guide.models.Product
 import com.example.cine_guide.movieresult
 import kotlinx.coroutines.channels.Channel
@@ -16,13 +17,15 @@ import kotlinx.coroutines.launch
 class productsViewmodel(
   private val productsRepository: ProductRepository
 ):ViewModel(){
-
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products = _products.asStateFlow()
     private val _showerror = Channel<Boolean>()
     val showerror  = _showerror.receiveAsFlow()
+    init{
+        getmovies()
+    }
+    fun getmovies() {
 
-    init {
         viewModelScope.launch {
             productsRepository.getProductList().collectLatest {result->
                 when(result){

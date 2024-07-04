@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.flow
 class ProductRepositoryImpl(
     private val api: Api
 ): ProductRepository {
-    override suspend fun getProductList(): Flow<movieresult<List<Product>>> {
+    override suspend fun getProductList(text:String?): Flow<movieresult<List<Product>>> {
       return flow {
          val productsFromApi = try {
-             api.getProductsList("39b12d0dcd3edc25a3a0c5e2fa9619fa")
+             var api_key = "39b12d0dcd3edc25a3a0c5e2fa9619fa"
+             api.getProductsList(api_key)
          }catch (e:Exception) {
              emit(movieresult.Error(message = "Cannot load movies"))
              return@flow

@@ -5,5 +5,5 @@ import com.example.cine_guide.movieresult
 import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
-    suspend fun getProductList(): Flow<movieresult<List<Product>>>
+    suspend fun getProductList(text:String? = ""): Flow<movieresult<List<Product>>>
 }
