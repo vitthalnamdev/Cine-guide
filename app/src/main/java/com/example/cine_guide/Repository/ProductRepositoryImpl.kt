@@ -12,7 +12,8 @@ class ProductRepositoryImpl(
     override suspend fun getProductList(): Flow<movieresult<List<Product>>> {
       return flow {
          val productsFromApi = try {
-             api.getProductsList("39b12d0dcd3edc25a3a0c5e2fa9619fa")
+             var api_key = "api_key"
+             api.getProductsList(api_key)
          }catch (e:Exception) {
              emit(movieresult.Error(message = "Cannot load movies"))
              return@flow

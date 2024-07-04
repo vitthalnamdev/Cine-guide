@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class productsViewmodel(
   private val productsRepository: ProductRepository
 ):ViewModel(){
-
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products = _products.asStateFlow()
     private val _showerror = Channel<Boolean>()

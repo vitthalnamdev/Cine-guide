@@ -1,5 +1,6 @@
 package com.example.cine_guide
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -8,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -56,42 +59,93 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.cine_guide.Repository.ProductRepositoryImpl
+import com.example.cine_guide.Repository.genreRepository
+import com.example.cine_guide.Repository.searchrepository
 import com.example.cine_guide.Retrofit.Retrofit_object
+import com.example.cine_guide.modelgenre.Genre
 import com.example.cine_guide.models.Product
 import com.example.cine_guide.presentation.productsViewmodel
 import com.example.cine_guide.ui.theme.CineGuideTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
-
-    private val viewModel by viewModels<productsViewmodel>(factoryProducer = {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return productsViewmodel(ProductRepositoryImpl(Retrofit_object.api))
-                        as T
-            }
-        }
-    })
-
+    var text =   mutableStateOf("")
+    private val genre_map = genreRepository(Retrofit_object.genre_api).getGenreList()
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             CineGuideTheme {
+                var iserror:Boolean = false
+                val genrelist:MutableList<Genre> = mutableListOf<Genre>()
+
+                 runBlocking {
+                     genre_map.collect{
+                         when(it){
+                             is movieresult.Error -> TODO()
+                             is movieresult.Success -> {
+                                 val curr  = it.data
+                                 if(curr!=null){
+                                     for(i in curr){
+                                         genrelist.add(i)
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+                var sz = genrelist.size
+
+                val int_to_String: HashMap<Int, String> = HashMap()
+                val String_to_int: HashMap<String, Int> = HashMap()
+                var genre = int_to_String[28]
+
+                for(i in genrelist){
+                    int_to_String[i.id] = i.name
+                    String_to_int[i.name] = i.id
+                }
+
                 App()
             }
         }
     }
 
+
+
+
     @Composable
     fun App(){
         val navController = rememberNavController()
+         val viewModel by viewModels<productsViewmodel>(factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return productsViewmodel(ProductRepositoryImpl(Retrofit_object.api))
+                            as T
+                }
+            }
+        })
+        val searchviewModel by viewModels<productsViewmodel>(factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return productsViewmodel(searchrepository(Retrofit_object.searchapi,"Avengers"))
+                            as T
+                }
+            }
+        })
+
          NavHost(navController = navController, startDestination = "intro"){
             composable(route = "intro"){
                 ImageWithTextOverlay(navController)
             }
             composable(route = "activity"){
-                Dashboard()
+                   Dashboard(viewModel, navController)
             }
         }
     }
@@ -169,11 +223,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun Search(navController: NavController) {
 
+        TextField(
+            value = text.value,
+            placeholder = { Text("Search...") },
+            onValueChange = { newText ->
+                text.value = newText
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .background(Color.White)
+                .padding(top = 28.dp, start = 14.dp, end = 14.dp),
+            shape = RoundedCornerShape(16.dp)
+        )
+
+
+    }
 
 
     @Composable
-        fun Dashboard() {
+        fun Dashboard(viewModel: productsViewmodel , navController: NavController) {
             val productList = viewModel.products.collectAsState().value
             val context = LocalContext.current
             LaunchedEffect(key1 = viewModel.showerror) {
@@ -191,7 +263,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Search()
+                    Search(navController)
 
                     LazyColumn {
                         var cnt = 0
@@ -223,21 +295,7 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        @Composable
-        fun Search() {
-            var text by remember { mutableStateOf("") }
-            TextField(
-                value = text,
-                placeholder = { Text("Search...") },
-                onValueChange = { newText ->
-                    text = newText
-                },
-                modifier = Modifier.fillMaxWidth().height(80.dp).background(Color.White)
-                    .padding(top = 28.dp, start = 14.dp, end = 14.dp),
-                shape = RoundedCornerShape(16.dp)
-            )
 
-        }
 
 
         @Composable
