@@ -14,7 +14,6 @@ class genreRepository(
 
         return flow {
             val productsFromApi = try {
-                var api_key = "39b12d0dcd3edc25a3a0c5e2fa9619fa"
                 api.getGenreList(api_key)
             }catch (e:Exception) {
                 emit(movieresult.Error(message = "Cannot load movies"))
