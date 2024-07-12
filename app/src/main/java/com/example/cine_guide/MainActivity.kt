@@ -59,6 +59,10 @@ import com.example.cine_guide.Repository.ProductRepositoryImpl
 import com.example.cine_guide.Retrofit.Retrofit_object
 import com.example.cine_guide.models.Product
 import com.example.cine_guide.presentation.productsViewmodel
+import com.example.cine_guide.presentation.sharedviewmodel
+import com.example.cine_guide.ui.Dashboard
+import com.example.cine_guide.ui.Movie
+import com.example.cine_guide.ui.Searchui
 import com.example.cine_guide.ui.theme.CineGuideTheme
 import kotlinx.coroutines.flow.collectLatest
 
@@ -78,20 +82,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CineGuideTheme {
+                Genre_getter.genre_getter()
                 App()
             }
         }
     }
 
     @Composable
-    fun App(){
+    fun App() {
         val navController = rememberNavController()
-         NavHost(navController = navController, startDestination = "intro"){
-            composable(route = "intro"){
+        var sharedviewmodel = sharedviewmodel()
+        NavHost(navController = navController, startDestination = "intro") {
+            composable(route = "intro") {
                 ImageWithTextOverlay(navController)
             }
-            composable(route = "activity"){
-                Dashboard()
+            composable(route = "activity") {
+
+                Dashboard(viewModel, navController , sharedviewmodel)
+            }
+            composable(route = "searchui"){
+                 Searchui(sharedviewmodel, navController)
+            }
+            composable(route = "movie") {
+
+                Movie(sharedviewmodel )
             }
         }
     }
@@ -157,7 +171,7 @@ class MainActivity : ComponentActivity() {
 
             Button(
                 onClick = {
-                   navController.navigate("activity")
+                    navController.navigate("activity")
                 }, modifier = Modifier.padding(start = 45.dp, end = 45.dp, top = 690.dp)
             ) {
                 Text(
@@ -168,203 +182,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-
-
-    @Composable
-        fun Dashboard() {
-            val productList = viewModel.products.collectAsState().value
-            val context = LocalContext.current
-            LaunchedEffect(key1 = viewModel.showerror) {
-                viewModel.showerror.collectLatest { show ->
-                    if (show) {
-                        Toast.makeText(
-                            context, "Error", Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-            if (productList.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Search()
-
-                    LazyColumn {
-                        var cnt = 0
-                        var sz = productList.size
-                        var ls: MutableList<Product> = mutableListOf()
-
-                        items(productList) { item ->
-
-                            cnt++
-                            ls.add(item)
-                            sz--;
-                            if (sz == 0 && cnt == 1) {
-                                LeftImage(ls[0])
-                            }
-                            if (cnt == 2) {
-                                cnt = 0
-                                Row() {
-                                    LeftImage(ls[0])
-                                    Spacer(modifier = Modifier.size(10.dp))
-                                    RightImage(ls[1])
-                                }
-                                ls.clear()
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-
-
-        @Composable
-        fun Search() {
-            var text by remember { mutableStateOf("") }
-            TextField(
-                value = text,
-                placeholder = { Text("Search...") },
-                onValueChange = { newText ->
-                    text = newText
-                },
-                modifier = Modifier.fillMaxWidth().height(80.dp).background(Color.White)
-                    .padding(top = 28.dp, start = 14.dp, end = 14.dp),
-                shape = RoundedCornerShape(16.dp)
-            )
-
-        }
-
-
-        @Composable
-        fun LeftImage(poster: Product) {
-            var basepath: String = "https://image.tmdb.org/t/p/original/"
-            var path = basepath + poster.poster_path
-            val imagepainter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current).data(path)
-                    .size(Size.ORIGINAL).build()
-            ).state
-            Column {
-                Card(
-                    modifier = Modifier
-                        .padding(top = 24.dp, start = 14.dp)
-                        .height(290.dp)
-                        .width(180.dp)
-                        .shadow(
-                            elevation = 10.dp
-                        ),
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                ) {
-                    if (imagepainter is AsyncImagePainter.State.Success) {
-                        Image(
-                            painter = imagepainter.painter,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-
-                            )
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-
-                }
-
-                Card(
-                    modifier = Modifier
-                        .padding(start = 14.dp)
-                        .height(25.dp)
-                        .width(180.dp)
-
-                        .shadow(
-                            elevation = 10.dp
-                        ),
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
-                ) {
-                    Text(
-                        text = poster.title,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                }
-            }
-
-
-        }
-
-
-        @Composable
-        fun RightImage(poster: Product) {
-            var basepath: String = "https://image.tmdb.org/t/p/original/"
-            var path = basepath + poster.poster_path
-            val imagepainter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current).data(path)
-                    .size(Size.ORIGINAL).build()
-            ).state
-            Column {
-                Card(
-                    modifier = Modifier
-                        .padding(top = 24.dp, end = 14.dp)
-                        .height(290.dp)
-                        .width(180.dp)
-
-                        .shadow(
-                            elevation = 10.dp
-                        ),
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                ) {
-
-                    if (imagepainter is AsyncImagePainter.State.Success) {
-                        Image(
-                            painter = imagepainter.painter,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-
-                            )
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-
-                }
-                Card(
-                    modifier = Modifier
-                        .padding(end = 14.dp)
-                        .height(25.dp)
-                        .width(180.dp)
-                        .shadow(
-                            elevation = 10.dp
-                        ),
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
-                ) {
-                    Text(
-                        text = poster.title,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                }
-            }
-        }
-    }
-
-
-
-
+}
 

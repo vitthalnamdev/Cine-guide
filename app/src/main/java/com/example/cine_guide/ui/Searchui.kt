@@ -69,6 +69,7 @@ import com.example.cine_guide.Retrofit.Retrofit_object
 import com.example.cine_guide.models.Product
 import com.example.cine_guide.presentation.productsViewmodel
 import com.example.cine_guide.presentation.searchviewmodel
+import com.example.cine_guide.presentation.sharedviewmodel
 import com.example.cine_guide.ui.Dashboard
 import com.example.cine_guide.ui.ImageWithTextOverlay
 import com.example.cine_guide.ui.Searchui
@@ -77,10 +78,10 @@ import com.example.cine_guide.ui.theme.Typography
 import kotlinx.coroutines.delay
 
 @Composable
-fun Searchui(){
+fun Searchui(sharedviewmodel: sharedviewmodel , navController: NavController){
 
     Column(modifier = Modifier.fillMaxSize()){
-        CustomSearchBar()
+        CustomSearchBar(sharedviewmodel , navController)
     }
 }
 
@@ -97,7 +98,7 @@ class MyViewModelFactory(var text:String) : ViewModelProvider.Factory {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomSearchBar() {
+fun CustomSearchBar(sharedviewmodel: sharedviewmodel , navController:NavController) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val keyboardController = LocalSoftwareKeyboardController.current
     var query by remember { mutableStateOf("") }
@@ -135,10 +136,11 @@ fun CustomSearchBar() {
             ),
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
-                .padding(top = 25.dp)
+                .fillMaxWidth()
+                .padding(start = 25.dp , top = 25.dp , end = 25.dp)
 
         )
         Spacer(modifier = Modifier.size(10.dp))
-        Movies(search)
+        Movies(search , sharedviewmodel , navController )
     }
 }

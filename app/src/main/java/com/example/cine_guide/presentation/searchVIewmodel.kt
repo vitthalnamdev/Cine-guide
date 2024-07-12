@@ -41,7 +41,6 @@ class searchviewmodel(
                      is movieresult.Success -> {
                             it.data?.let{ products->
                                  _product_list.update { products }
-
                             }
                      }
                  }

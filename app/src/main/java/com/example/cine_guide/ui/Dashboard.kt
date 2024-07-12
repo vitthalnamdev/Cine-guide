@@ -3,6 +3,7 @@ package com.example.cine_guide.ui
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,12 +55,14 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.example.cine_guide.Genre_getter
 import com.example.cine_guide.models.Product
 import com.example.cine_guide.presentation.productsViewmodel
+import com.example.cine_guide.presentation.sharedviewmodel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun Dashboard(viewModel: productsViewmodel, navController: NavController) {
+fun Dashboard(viewModel: productsViewmodel, navController: NavController , sharedviewmodel: sharedviewmodel) {
 
     val productList = viewModel.products.collectAsState().value
     val context = LocalContext.current
@@ -80,13 +83,13 @@ fun Dashboard(viewModel: productsViewmodel, navController: NavController) {
             }
         } else {
             Spacer(modifier = Modifier.size(5.dp))
-            Movies(productList)
+            Movies(productList , sharedviewmodel , navController)
         }
     }
 }
 
 @Composable
-fun Movies(productList: List<Product>) {
+fun Movies(productList: List<Product> , sharedviewmodel: sharedviewmodel , navController: NavController) {
     val liststate = LazyListState()
     LaunchedEffect(Unit) {
         liststate.scrollToItem(0)
@@ -103,16 +106,16 @@ fun Movies(productList: List<Product>) {
             ls.add(item)
             sz--;
             if (sz == 0 && cnt == 1) {
-                LeftImage(ls[0])
+                LeftImage(ls[0] ,sharedviewmodel, navController)
             }
 
 
             if (cnt == 2) {
                 cnt = 0
                 Row() {
-                    LeftImage(ls[0])
+                    LeftImage(ls[0] , sharedviewmodel , navController  )
                     Spacer(modifier = Modifier.size(10.dp))
-                    RightImage(ls[1])
+                    RightImage(ls[1] , sharedviewmodel , navController )
                 }
                 ls.clear()
             }
@@ -140,7 +143,7 @@ fun MyTopAppBar(navController: NavController) {
             scrolledContainerColor = Color.Black
         ),
         actions = {
-            IconButton(onClick = { navController.navigate("searchview") }) {
+            IconButton(onClick = { navController.navigate("searchui") }) {
                 Icon(Icons.Filled.Search, contentDescription = "Search")
             }
             IconButton(onClick = { /* Handle more icon click */ }) {
@@ -152,7 +155,7 @@ fun MyTopAppBar(navController: NavController) {
 
 
 @Composable
-fun LeftImage(poster: Product) {
+fun LeftImage(poster: Product, sharedviewmodel: sharedviewmodel , navController: NavController) {
     var basepath: String = "https://image.tmdb.org/t/p/original/"
     var path = basepath + poster.poster_path
     val imagepainter = rememberAsyncImagePainter(
@@ -165,6 +168,10 @@ fun LeftImage(poster: Product) {
                 .padding(top = 24.dp, start = 14.dp)
                 .height(290.dp)
                 .width(180.dp)
+                .clickable {
+                    sharedviewmodel.addposter(poster)
+                    navController.navigate("movie")
+                }
                 .shadow(
                     elevation = 10.dp
                 ),
@@ -193,7 +200,10 @@ fun LeftImage(poster: Product) {
                 .padding(start = 14.dp)
                 .height(25.dp)
                 .width(180.dp)
-
+                .clickable {
+                    sharedviewmodel.addposter(poster)
+                    navController.navigate("movie")
+                }
                 .shadow(
                     elevation = 10.dp
                 ),
@@ -215,7 +225,7 @@ fun LeftImage(poster: Product) {
 
 
 @Composable
-fun RightImage(poster: Product) {
+fun RightImage(poster: Product , sharedviewmodel: sharedviewmodel, navController: NavController) {
     var basepath: String = "https://image.tmdb.org/t/p/original/"
     var path = basepath + poster.poster_path
     val imagepainter = rememberAsyncImagePainter(
@@ -228,7 +238,10 @@ fun RightImage(poster: Product) {
                 .padding(top = 24.dp, end = 14.dp)
                 .height(290.dp)
                 .width(180.dp)
-
+                .clickable {
+                    sharedviewmodel.addposter(poster)
+                    navController.navigate("movie")
+                }
                 .shadow(
                     elevation = 10.dp
                 ),
@@ -257,6 +270,10 @@ fun RightImage(poster: Product) {
                 .padding(end = 14.dp)
                 .height(25.dp)
                 .width(180.dp)
+                .clickable {
+                    sharedviewmodel.addposter(poster)
+                    navController.navigate("movie")
+                }
                 .shadow(
                     elevation = 10.dp
                 ),
