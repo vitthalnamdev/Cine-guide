@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
             }
             composable(route = "movie") {
 
-                Movie(sharedviewmodel )
+                Movie(sharedviewmodel)
             }
         }
     }

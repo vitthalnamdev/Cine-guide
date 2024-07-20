@@ -66,7 +66,11 @@ fun Movie(sharedviewmodel: sharedviewmodel){
     val verticalscrollState = rememberScrollState()
     var poster = sharedviewmodel.poster
     Column(modifier = Modifier.verticalScroll(verticalscrollState)){
-        Imageadd(poster!!.backdrop_path)
+        var image = poster!!.poster_path
+        if(poster!!.backdrop_path!=null){
+            image = poster.backdrop_path
+        }
+        Imageadd(image)
         TextDisplay(poster.title)
         Spacer(modifier = Modifier.size(12.dp))
 

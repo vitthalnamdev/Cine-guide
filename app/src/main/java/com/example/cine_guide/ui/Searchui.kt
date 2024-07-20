@@ -101,12 +101,12 @@ class MyViewModelFactory(var text:String) : ViewModelProvider.Factory {
 fun CustomSearchBar(sharedviewmodel: sharedviewmodel , navController:NavController) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val keyboardController = LocalSoftwareKeyboardController.current
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(sharedviewmodel.search) }
     var searchmovies:searchviewmodel = viewModel(
         factory = MyViewModelFactory(query)
     )
     searchmovies._query.value = query
-
+    sharedviewmodel.search  = query
     LaunchedEffect(query) {
           delay(500L)
             searchmovies.getmovies()
@@ -127,13 +127,14 @@ fun CustomSearchBar(sharedviewmodel: sharedviewmodel , navController:NavControll
                     contentDescription = "Search"
                 )
             },
-            placeholder = { Text("Search") },
+            placeholder = { Text("Search" ) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Blue,
                 unfocusedIndicatorColor = Color.Gray
-            ),
+            )
+            ,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()

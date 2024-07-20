@@ -76,7 +76,7 @@ fun Dashboard(viewModel: productsViewmodel, navController: NavController , share
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        MyTopAppBar(navController)
+        MyTopAppBar(navController , sharedviewmodel)
         if (productList.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -127,7 +127,7 @@ fun Movies(productList: List<Product> , sharedviewmodel: sharedviewmodel , navCo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar(navController: NavController) {
+fun MyTopAppBar(navController: NavController , sharedviewmodel: sharedviewmodel) {
     TopAppBar(
         title = { Text("Cine Guide") },
         navigationIcon = {
@@ -143,7 +143,8 @@ fun MyTopAppBar(navController: NavController) {
             scrolledContainerColor = Color.Black
         ),
         actions = {
-            IconButton(onClick = { navController.navigate("searchui") }) {
+            IconButton(onClick = {sharedviewmodel.search= ""
+                navController.navigate("searchui") }) {
                 Icon(Icons.Filled.Search, contentDescription = "Search")
             }
             IconButton(onClick = { /* Handle more icon click */ }) {
@@ -170,6 +171,7 @@ fun LeftImage(poster: Product, sharedviewmodel: sharedviewmodel , navController:
                 .width(180.dp)
                 .clickable {
                     sharedviewmodel.addposter(poster)
+
                     navController.navigate("movie")
                 }
                 .shadow(
